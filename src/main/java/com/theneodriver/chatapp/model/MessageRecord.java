@@ -24,14 +24,14 @@ public class MessageRecord {
     private Long id;
     
     @OneToOne
-    @JoinColumn(name = "message_id")
+    @JoinColumn(name = "message_id", referencedColumnName = "id")
     private Message message;
     
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User sender;
     
     @OneToOne
-    @JoinColumn(name = "conversation_id")
+    @JoinColumn(name = "conversation_id", referencedColumnName = "id")
     private Conversation conversation;
 }

@@ -1,8 +1,9 @@
 package com.theneodriver.chatapp.model;
 
-import java.util.List;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,13 +35,8 @@ public class Conversation {
     @Column(name = "name")
     private String name;
     
-    @ManyToMany
-    @JoinTable(
-            name = "user_in_conversation",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "conversation_id") }
-    )
-    private List<User> users;
+    @ManyToMany(mappedBy = "conversation")
+    private Set<User> users;
     
     @OneToOne(mappedBy = "conversation")
     private MessageRecord record;

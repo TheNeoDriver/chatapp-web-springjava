@@ -1,12 +1,14 @@
 package com.theneodriver.chatapp.model;
 
-import java.util.List;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -35,11 +37,16 @@ public class User {
     private String password;
     
     @OneToOne
-    @JoinColumn(name = "image_id")
-    private String imageLink;
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Image image;
     
-    @ManyToMany(mappedBy = "user")
-    private List<Conversation> conversations;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "user_in_conversation",
+        joinColumns = { @JoinColumn(name = "conversation_id") },
+        inverseJoinColumns = { @JoinColumn(name = "user_id") }
+    )
+    private Set<Conversation> conversations;
     
     @OneToOne(mappedBy = "user")
     private MessageRecord record;

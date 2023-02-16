@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,9 +23,13 @@ public class Image {
     @Column(name = "id")
     private Long id;
     
+    @NotNull
     @Column(name = "link")
     private String link;
     
     @OneToOne(mappedBy = "image")
     private User user;
+    
+    @OneToOne(mappedBy = "image")
+    private Message message;
 }
