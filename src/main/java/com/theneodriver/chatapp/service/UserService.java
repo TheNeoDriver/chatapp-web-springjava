@@ -1,6 +1,6 @@
 package com.theneodriver.chatapp.service;
 
-import com.theneodriver.chatapp.dto.Response;
+import com.theneodriver.chatapp.dto.PageResponse;
 import com.theneodriver.chatapp.dto.UserDto;
 import com.theneodriver.chatapp.model.User;
 import com.theneodriver.chatapp.repository.UserRepository;
@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -20,11 +21,28 @@ public class UserService {
     @Autowired
     private UserRepository repository;
     
-    /*public UserDto authorizeUser(User user) {
     
-    }*/
-
-    public Response<UserDto> findAllByName (
+    public UserDto authorizeUser(User userLogin) {
+        User user = repository
+                .findByName(userLogin.getName())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+        
+        String encryptedPassword = encryptPassword(userLogin.getPassword());
+        if (! user.getPassword().equals(encryptedPassword)) {
+            return null;
+        }
+        
+        UserDto dto = new UserDto(
+                user.getName(),
+                user.getImage().getLink(),
+                user.getConversations()
+        );
+        return dto;
+    }
+    
+    
+    @Transactional
+    public PageResponse<UserDto> findAllByName (
             String name,
             int pageNumber,
             int pageSize,
@@ -44,7 +62,7 @@ public class UserService {
                                         .map(user -> mapToDto(user))
                                         .collect(Collectors.toList());
         
-        Response<UserDto> response = new Response<>(
+        PageResponse<UserDto> response = new PageResponse<>(
                         content,
                         users.getNumber(),
                         users.getSize(),
@@ -56,10 +74,14 @@ public class UserService {
         return response;
     }
     
+    
+    @Transactional
     public UserDto save(User user) {
         return mapToDto(repository.save(user));
     }
     
+    
+    @Transactional
     public UserDto update(String actualName, User userUpdated) {
         User user = repository
                 .findByName(actualName)
@@ -71,19 +93,22 @@ public class UserService {
         return mapToDto(repository.save(user));
     }
     
+    
+    @Transactional
     public void deleteByName(String name) {
         repository.deleteByName(name);
     }
+    
     
     private String encryptPassword(String password) {
         return "";
     }
     
+    
     private UserDto mapToDto(User user) {
-        UserDto dto = new UserDto(
-                user.getName(),
-                user.getImageLink()
-        );
+        UserDto dto = new UserDto();
+        dto.setName(user.getName());
+        dto.setImageLink(user.getImage().getLink());
         return dto;
     }
     

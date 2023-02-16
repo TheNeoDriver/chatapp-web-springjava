@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Response<T> {
+public class PageResponse<T> {
     private List<T> content;
     private int pageNumber;
     private int pageSize;

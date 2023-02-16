@@ -1,7 +1,7 @@
 package com.theneodriver.chatapp.service;
 
-import com.theneodriver.chatapp.dto.MessageRecordDto;
-import com.theneodriver.chatapp.dto.Response;
+import com.theneodriver.chatapp.dto.MessageDto;
+import com.theneodriver.chatapp.dto.PageResponse;
 import com.theneodriver.chatapp.model.MessageRecord;
 import com.theneodriver.chatapp.repository.MessageRepository;
 import java.util.List;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MessageService {
@@ -19,7 +20,9 @@ public class MessageService {
     @Autowired
     private MessageRepository repository;
     
-    public Response<MessageRecordDto> findAllMessagesByConversationId(
+    
+    @Transactional
+    public PageResponse<MessageDto> findAllMessagesByConversationId(
             long conversationId,
             int pageNumber,
             int pageSize,
@@ -34,12 +37,12 @@ public class MessageService {
         Page<MessageRecord> records
                 = repository.findAllByConversation_Id(conversationId, pageable);
         
-        List<MessageRecordDto> content = records.getContent()
+        List<MessageDto> content = records.getContent()
                                         .stream()
                                         .map(record -> mapToDto(record))
                                         .collect(Collectors.toList());
         
-        Response<MessageRecordDto> response = new Response<>(
+        PageResponse<MessageDto> response = new PageResponse<>(
                         content,
                         records.getNumber(),
                         records.getSize(),
@@ -51,12 +54,13 @@ public class MessageService {
         return response;
     }
     
-    private MessageRecordDto mapToDto(MessageRecord model) {
-        MessageRecordDto dto = new MessageRecordDto(
-                model.getConversation().getId(),
-                model.getSender().getName(),
-                model.getMessage().getContent(),
-                model.getMessage().getPostDate()
+    
+    private MessageDto mapToDto(MessageRecord model) {
+        MessageDto dto = new MessageDto(
+            model.getConversation().getId(),
+            model.getSender().getName(),
+            model.getMessage().getContent(),
+            model.getMessage().getPostDate()
         );
         
         return dto;
